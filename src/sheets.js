@@ -5,6 +5,9 @@ const { GoogleAuth } = require('google-auth-library');
 // GOOGLE_CREDENTIALS をオブジェクトに変換
 const googleCredentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
+// private_key の改行を実際の改行に置換
+googleCredentials.private_key = googleCredentials.private_key.replace(/\\n/g, '\n');
+
 const auth = new GoogleAuth({
   credentials: googleCredentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
