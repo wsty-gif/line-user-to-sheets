@@ -2,19 +2,19 @@ require('dotenv').config();
 const { google } = require('googleapis');
 const { GoogleAuth } = require('google-auth-library');
 
-const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+// GOOGLE_CREDENTIALS をオブジェクトに変換
+const googleCredentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 const auth = new GoogleAuth({
-  credentials: creds,
+  credentials: googleCredentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
-
 
 const sheets = google.sheets({ version: 'v4', auth });
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SHEET_NAME = process.env.SHEET_NAME || 'Sheet1';
+
 const DATA_RANGE = `${SHEET_NAME}!A:E`; // timestamp, botName, userId, displayName, pictureUrl
 
 // ヘッダー行を保証
