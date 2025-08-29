@@ -2,8 +2,10 @@ require('dotenv').config();
 const { google } = require('googleapis');
 const { GoogleAuth } = require('google-auth-library');
 
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+
 const auth = new GoogleAuth({
-  keyFile: './service-account.json',
+  credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
