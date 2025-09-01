@@ -1,6 +1,6 @@
 // pages/api/users.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getUsers } from "../../../src/sheets";
+import { getUsers } from "../../src/sheets";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

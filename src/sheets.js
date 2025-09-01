@@ -18,23 +18,23 @@ const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SHEET_NAME = process.env.SHEET_NAME || 'Sheet1';
 
-const DATA_RANGE = `${SHEET_NAME}!A:E`; // timestamp, botName, userId, displayName, pictureUrl
+const DATA_RANGE = `${SHEET_NAME}!A:G`; // timestamp, botName, userId, displayName, pictureUrl, 'role', 'update'
 
 // ヘッダー行を保証
 async function ensureHeaderRow() {
   try {
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A1:E1`,
+      range: `${SHEET_NAME}!A1:G1`,
     });
 
     const values = res.data.values;
-    const expected = ['timestamp', 'botName', 'userId', 'displayName', 'pictureUrl'];
+    const expected = ['timestamp', 'botName', 'userId', 'displayName', 'pictureUrl', 'role', 'update'];
 
     if (!values || !values[0] || values[0].length === 0 || values[0].join('') === '') {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_NAME}!A1:E1`,
+        range: `${SHEET_NAME}!A1:G1`,
         valueInputOption: 'RAW',
         requestBody: { values: [expected] },
       });
@@ -77,7 +77,7 @@ async function upsertUserProfile({ timestamp, botName, userId, displayName, pict
     // 上書き
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A${targetRow}:E${targetRow}`,
+      range: `${SHEET_NAME}!A${targetRow}:G${targetRow}`,
       valueInputOption: 'RAW',
       requestBody: { values: record },
     });
