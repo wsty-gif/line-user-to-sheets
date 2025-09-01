@@ -82,8 +82,6 @@ async function handleEvent(event, client, botName) {
     const profile = await client.getProfile(userId);
     const displayName = profile.displayName || '';
     const pictureUrl = profile.pictureUrl || '';
-    const role = '';
-    const updatedAt = '';
 
     await upsertUserProfile({
       timestamp: new Date().toISOString(),
@@ -91,8 +89,6 @@ async function handleEvent(event, client, botName) {
       userId,
       displayName,
       pictureUrl,
-      role,
-      updatedAt,
     });
 
     console.log(`[${botName}] 友だちID: ${userId}, displayName: ${displayName}`);
