@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 
-export default function AdminPage() {
-  const [rows, setRows] = useState<string[][]>([]);
+type User = { name: string; email: string };
+
+export default function Admin() {
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    fetch("/api/admin-data")
+    fetch("/api/users")
       .then(res => res.json())
-      .then(data => setRows(data));
+      .then(setUsers)
+      .catch(console.error);
   }, []);
 
   return (
@@ -14,12 +17,13 @@ export default function AdminPage() {
       <h1>管理者画面</h1>
       <table border={1} cellPadding={5}>
         <thead>
-          <tr>{rows[0]?.map((col, idx) => <th key={idx}>{col}</th>)}</tr>
+          <tr><th>名前</th><th>メール</th></tr>
         </thead>
         <tbody>
-          {rows.slice(1).map((row, idx) => (
-            <tr key={idx}>
-              {row.map((col, i) => <td key={i}>{col}</td>)}
+          {users.map((u, i) => (
+            <tr key={i}>
+              <td>{u.name}</td>
+              <td>{u.email}</td>
             </tr>
           ))}
         </tbody>

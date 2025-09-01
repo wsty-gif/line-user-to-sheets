@@ -1,3 +1,18 @@
-.env
-service-account.json
-node_modules/
+{
+  "name": "line-user-to-sheets",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "13.5.11",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "@line/bot-sdk": "^7.7.0",
+    "dotenv": "^16.3.1",
+    "googleapis": "^131.0.0"
+  }
+}
