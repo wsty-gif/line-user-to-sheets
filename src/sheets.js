@@ -62,7 +62,7 @@ async function upsertUserProfile({ timestamp, botName, userId, displayName, pict
     }
   }
 
-  const record = [[timestamp, botName, userId, displayName, pictureUrl]];
+  const record = [[timestamp, botName, userId, displayName, pictureUrl, 'user', new Date().toISOString()]];
 
   if (targetRow === -1) {
     // 追記
