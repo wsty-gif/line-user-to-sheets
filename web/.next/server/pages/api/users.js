@@ -1,0 +1,112 @@
+/*
+ * ATTENTION: An "eval-source-map" devtool has been used.
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+(() => {
+var exports = {};
+exports.id = "pages/api/users";
+exports.ids = ["pages/api/users"];
+exports.modules = {
+
+/***/ "dotenv":
+/*!*************************!*\
+  !*** external "dotenv" ***!
+  \*************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("dotenv");
+
+/***/ }),
+
+/***/ "google-auth-library":
+/*!**************************************!*\
+  !*** external "google-auth-library" ***!
+  \**************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("google-auth-library");
+
+/***/ }),
+
+/***/ "googleapis":
+/*!*****************************!*\
+  !*** external "googleapis" ***!
+  \*****************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("googleapis");
+
+/***/ }),
+
+/***/ "next/dist/compiled/next-server/pages-api.runtime.dev.js":
+/*!**************************************************************************!*\
+  !*** external "next/dist/compiled/next-server/pages-api.runtime.dev.js" ***!
+  \**************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("next/dist/compiled/next-server/pages-api.runtime.dev.js");
+
+/***/ }),
+
+/***/ "(api)/../src/sheets.js":
+/*!************************!*\
+  !*** ../src/sheets.js ***!
+  \************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("(__webpack_require__(/*! dotenv */ \"dotenv\").config)();\r\nconst { google } = __webpack_require__(/*! googleapis */ \"googleapis\");\r\nconst { GoogleAuth } = __webpack_require__(/*! google-auth-library */ \"google-auth-library\");\r\n\r\n// GOOGLE_CREDENTIALS をオブジェクトに変換\r\nconst googleCredentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);\r\n\r\n// private_key の改行を実際の改行に置換\r\ngoogleCredentials.private_key = googleCredentials.private_key.replace(/\\\\n/g, '\\n');\r\n\r\nconst auth = new GoogleAuth({\r\n  credentials: googleCredentials,\r\n  scopes: ['https://www.googleapis.com/auth/spreadsheets'],\r\n});\r\n\r\nconst sheets = google.sheets({ version: 'v4', auth });\r\n\r\nconst SPREADSHEET_ID = process.env.SPREADSHEET_ID;\r\nconst SHEET_NAME = process.env.SHEET_NAME || 'Sheet1';\r\n\r\nconst DATA_RANGE = `${SHEET_NAME}!A:G`; // timestamp, botName, userId, displayName, pictureUrl, role, updatedAt\r\n\r\n// ヘッダー行を保証\r\nasync function ensureHeaderRow() {\r\n  try {\r\n    const res = await sheets.spreadsheets.values.get({\r\n      spreadsheetId: SPREADSHEET_ID,\r\n      range: `${SHEET_NAME}!A1:G1`,\r\n    });\r\n\r\n    const values = res.data.values;\r\n    const expected = ['timestamp', 'botName', 'userId', 'displayName', 'pictureUrl', 'role', 'updatedAt'];\r\n\r\n    if (!values || !values[0] || values[0].length === 0 || values[0].join('') === '') {\r\n      await sheets.spreadsheets.values.update({\r\n        spreadsheetId: SPREADSHEET_ID,\r\n        range: `${SHEET_NAME}!A1:G1`,\r\n        valueInputOption: 'RAW',\r\n        requestBody: { values: [expected] },\r\n      });\r\n    }\r\n  } catch (e) {\r\n    throw e;\r\n  }\r\n}\r\n\r\n// ユーザープロファイルを追加または上書き\r\nasync function upsertUserProfile({ timestamp, botName, userId, displayName, pictureUrl, role, updatedAt }) {\r\n  const res = await sheets.spreadsheets.values.get({\r\n    spreadsheetId: SPREADSHEET_ID,\r\n    range: DATA_RANGE,\r\n  });\r\n\r\n  const rows = res.data.values || [];\r\n  let targetRow = -1;\r\n\r\n  for (let i = 1; i < rows.length; i++) {\r\n    // B列(botName)とC列(userId)でユニーク判定\r\n    if (rows[i][1] === botName && rows[i][2] === userId) {\r\n      targetRow = i + 1;\r\n      break;\r\n    }\r\n  }\r\n\r\n  const record = [[timestamp, botName, userId, displayName, pictureUrl, role, updatedAt]];\r\n\r\n  if (targetRow === -1) {\r\n    // 追記\r\n    await sheets.spreadsheets.values.append({\r\n      spreadsheetId: SPREADSHEET_ID,\r\n      range: DATA_RANGE,\r\n      valueInputOption: 'RAW',\r\n      insertDataOption: 'INSERT_ROWS',\r\n      requestBody: { values: record },\r\n    });\r\n  } else {\r\n    // 上書き\r\n    await sheets.spreadsheets.values.update({\r\n      spreadsheetId: SPREADSHEET_ID,\r\n      range: `${SHEET_NAME}!A${targetRow}:E${targetRow}`,\r\n      valueInputOption: 'RAW',\r\n      requestBody: { values: record },\r\n    });\r\n  }\r\n}\r\n\r\nmodule.exports = { ensureHeaderRow, upsertUserProfile };\r\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi4vc3JjL3NoZWV0cy5qcyIsIm1hcHBpbmdzIjoiQUFBQSxvREFBd0I7QUFDeEIsUUFBUSxTQUFTLEVBQUUsbUJBQU8sQ0FBQyw4QkFBWTtBQUN2QyxRQUFRLGFBQWEsRUFBRSxtQkFBTyxDQUFDLGdEQUFxQjtBQUNwRDtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLENBQUM7QUFDRDtBQUNBLCtCQUErQixxQkFBcUI7QUFDcEQ7QUFDQTtBQUNBO0FBQ0E7QUFDQSxzQkFBc0IsV0FBVyxPQUFPO0FBQ3hDO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLGdCQUFnQixXQUFXO0FBQzNCLEtBQUs7QUFDTDtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLGtCQUFrQixXQUFXO0FBQzdCO0FBQ0EsdUJBQXVCLG9CQUFvQjtBQUMzQyxPQUFPO0FBQ1A7QUFDQSxJQUFJO0FBQ0o7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLG1DQUFtQyxzRUFBc0U7QUFDekc7QUFDQTtBQUNBO0FBQ0EsR0FBRztBQUNIO0FBQ0E7QUFDQTtBQUNBO0FBQ0Esa0JBQWtCLGlCQUFpQjtBQUNuQztBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLHFCQUFxQixnQkFBZ0I7QUFDckMsS0FBSztBQUNMLElBQUk7QUFDSjtBQUNBO0FBQ0E7QUFDQSxnQkFBZ0IsV0FBVyxJQUFJLFVBQVUsSUFBSSxVQUFVO0FBQ3ZEO0FBQ0EscUJBQXFCLGdCQUFnQjtBQUNyQyxLQUFLO0FBQ0w7QUFDQTtBQUNBO0FBQ0EsbUJBQW1CIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vd2ViLy4uL3NyYy9zaGVldHMuanM/OGU3ZiJdLCJzb3VyY2VzQ29udGVudCI6WyJyZXF1aXJlKCdkb3RlbnYnKS5jb25maWcoKTtcclxuY29uc3QgeyBnb29nbGUgfSA9IHJlcXVpcmUoJ2dvb2dsZWFwaXMnKTtcclxuY29uc3QgeyBHb29nbGVBdXRoIH0gPSByZXF1aXJlKCdnb29nbGUtYXV0aC1saWJyYXJ5Jyk7XHJcblxyXG4vLyBHT09HTEVfQ1JFREVOVElBTFMg44KS44Kq44OW44K444Kn44Kv44OI44Gr5aSJ5o+bXHJcbmNvbnN0IGdvb2dsZUNyZWRlbnRpYWxzID0gSlNPTi5wYXJzZShwcm9jZXNzLmVudi5HT09HTEVfQ1JFREVOVElBTFMpO1xyXG5cclxuLy8gcHJpdmF0ZV9rZXkg44Gu5pS56KGM44KS5a6f6Zqb44Gu5pS56KGM44Gr572u5o+bXHJcbmdvb2dsZUNyZWRlbnRpYWxzLnByaXZhdGVfa2V5ID0gZ29vZ2xlQ3JlZGVudGlhbHMucHJpdmF0ZV9rZXkucmVwbGFjZSgvXFxcXG4vZywgJ1xcbicpO1xyXG5cclxuY29uc3QgYXV0aCA9IG5ldyBHb29nbGVBdXRoKHtcclxuICBjcmVkZW50aWFsczogZ29vZ2xlQ3JlZGVudGlhbHMsXHJcbiAgc2NvcGVzOiBbJ2h0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvc3ByZWFkc2hlZXRzJ10sXHJcbn0pO1xyXG5cclxuY29uc3Qgc2hlZXRzID0gZ29vZ2xlLnNoZWV0cyh7IHZlcnNpb246ICd2NCcsIGF1dGggfSk7XHJcblxyXG5jb25zdCBTUFJFQURTSEVFVF9JRCA9IHByb2Nlc3MuZW52LlNQUkVBRFNIRUVUX0lEO1xyXG5jb25zdCBTSEVFVF9OQU1FID0gcHJvY2Vzcy5lbnYuU0hFRVRfTkFNRSB8fCAnU2hlZXQxJztcclxuXHJcbmNvbnN0IERBVEFfUkFOR0UgPSBgJHtTSEVFVF9OQU1FfSFBOkdgOyAvLyB0aW1lc3RhbXAsIGJvdE5hbWUsIHVzZXJJZCwgZGlzcGxheU5hbWUsIHBpY3R1cmVVcmwsIHJvbGUsIHVwZGF0ZWRBdFxyXG5cclxuLy8g44OY44OD44OA44O86KGM44KS5L+d6Ki8XHJcbmFzeW5jIGZ1bmN0aW9uIGVuc3VyZUhlYWRlclJvdygpIHtcclxuICB0cnkge1xyXG4gICAgY29uc3QgcmVzID0gYXdhaXQgc2hlZXRzLnNwcmVhZHNoZWV0cy52YWx1ZXMuZ2V0KHtcclxuICAgICAgc3ByZWFkc2hlZXRJZDogU1BSRUFEU0hFRVRfSUQsXHJcbiAgICAgIHJhbmdlOiBgJHtTSEVFVF9OQU1FfSFBMTpHMWAsXHJcbiAgICB9KTtcclxuXHJcbiAgICBjb25zdCB2YWx1ZXMgPSByZXMuZGF0YS52YWx1ZXM7XHJcbiAgICBjb25zdCBleHBlY3RlZCA9IFsndGltZXN0YW1wJywgJ2JvdE5hbWUnLCAndXNlcklkJywgJ2Rpc3BsYXlOYW1lJywgJ3BpY3R1cmVVcmwnLCAncm9sZScsICd1cGRhdGVkQXQnXTtcclxuXHJcbiAgICBpZiAoIXZhbHVlcyB8fCAhdmFsdWVzWzBdIHx8IHZhbHVlc1swXS5sZW5ndGggPT09IDAgfHwgdmFsdWVzWzBdLmpvaW4oJycpID09PSAnJykge1xyXG4gICAgICBhd2FpdCBzaGVldHMuc3ByZWFkc2hlZXRzLnZhbHVlcy51cGRhdGUoe1xyXG4gICAgICAgIHNwcmVhZHNoZWV0SWQ6IFNQUkVBRFNIRUVUX0lELFxyXG4gICAgICAgIHJhbmdlOiBgJHtTSEVFVF9OQU1FfSFBMTpHMWAsXHJcbiAgICAgICAgdmFsdWVJbnB1dE9wdGlvbjogJ1JBVycsXHJcbiAgICAgICAgcmVxdWVzdEJvZHk6IHsgdmFsdWVzOiBbZXhwZWN0ZWRdIH0sXHJcbiAgICAgIH0pO1xyXG4gICAgfVxyXG4gIH0gY2F0Y2ggKGUpIHtcclxuICAgIHRocm93IGU7XHJcbiAgfVxyXG59XHJcblxyXG4vLyDjg6bjg7zjgrbjg7zjg5fjg63jg5XjgqHjgqTjg6vjgpLov73liqDjgb7jgZ/jga/kuIrmm7jjgY1cclxuYXN5bmMgZnVuY3Rpb24gdXBzZXJ0VXNlclByb2ZpbGUoeyB0aW1lc3RhbXAsIGJvdE5hbWUsIHVzZXJJZCwgZGlzcGxheU5hbWUsIHBpY3R1cmVVcmwsIHJvbGUsIHVwZGF0ZWRBdCB9KSB7XHJcbiAgY29uc3QgcmVzID0gYXdhaXQgc2hlZXRzLnNwcmVhZHNoZWV0cy52YWx1ZXMuZ2V0KHtcclxuICAgIHNwcmVhZHNoZWV0SWQ6IFNQUkVBRFNIRUVUX0lELFxyXG4gICAgcmFuZ2U6IERBVEFfUkFOR0UsXHJcbiAgfSk7XHJcblxyXG4gIGNvbnN0IHJvd3MgPSByZXMuZGF0YS52YWx1ZXMgfHwgW107XHJcbiAgbGV0IHRhcmdldFJvdyA9IC0xO1xyXG5cclxuICBmb3IgKGxldCBpID0gMTsgaSA8IHJvd3MubGVuZ3RoOyBpKyspIHtcclxuICAgIC8vIELliJcoYm90TmFtZSnjgahD5YiXKHVzZXJJZCnjgafjg6bjg4vjg7zjgq/liKTlrppcclxuICAgIGlmIChyb3dzW2ldWzFdID09PSBib3ROYW1lICYmIHJvd3NbaV1bMl0gPT09IHVzZXJJZCkge1xyXG4gICAgICB0YXJnZXRSb3cgPSBpICsgMTtcclxuICAgICAgYnJlYWs7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICBjb25zdCByZWNvcmQgPSBbW3RpbWVzdGFtcCwgYm90TmFtZSwgdXNlcklkLCBkaXNwbGF5TmFtZSwgcGljdHVyZVVybCwgcm9sZSwgdXBkYXRlZEF0XV07XHJcblxyXG4gIGlmICh0YXJnZXRSb3cgPT09IC0xKSB7XHJcbiAgICAvLyDov73oqJhcclxuICAgIGF3YWl0IHNoZWV0cy5zcHJlYWRzaGVldHMudmFsdWVzLmFwcGVuZCh7XHJcbiAgICAgIHNwcmVhZHNoZWV0SWQ6IFNQUkVBRFNIRUVUX0lELFxyXG4gICAgICByYW5nZTogREFUQV9SQU5HRSxcclxuICAgICAgdmFsdWVJbnB1dE9wdGlvbjogJ1JBVycsXHJcbiAgICAgIGluc2VydERhdGFPcHRpb246ICdJTlNFUlRfUk9XUycsXHJcbiAgICAgIHJlcXVlc3RCb2R5OiB7IHZhbHVlczogcmVjb3JkIH0sXHJcbiAgICB9KTtcclxuICB9IGVsc2Uge1xyXG4gICAgLy8g5LiK5pu444GNXHJcbiAgICBhd2FpdCBzaGVldHMuc3ByZWFkc2hlZXRzLnZhbHVlcy51cGRhdGUoe1xyXG4gICAgICBzcHJlYWRzaGVldElkOiBTUFJFQURTSEVFVF9JRCxcclxuICAgICAgcmFuZ2U6IGAke1NIRUVUX05BTUV9IUEke3RhcmdldFJvd306RSR7dGFyZ2V0Um93fWAsXHJcbiAgICAgIHZhbHVlSW5wdXRPcHRpb246ICdSQVcnLFxyXG4gICAgICByZXF1ZXN0Qm9keTogeyB2YWx1ZXM6IHJlY29yZCB9LFxyXG4gICAgfSk7XHJcbiAgfVxyXG59XHJcblxyXG5tb2R1bGUuZXhwb3J0cyA9IHsgZW5zdXJlSGVhZGVyUm93LCB1cHNlcnRVc2VyUHJvZmlsZSB9O1xyXG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(api)/../src/sheets.js\n");
+
+/***/ }),
+
+/***/ "(api)/./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fusers&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cusers.ts&middlewareConfigBase64=e30%3D!":
+/*!****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fusers&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cusers.ts&middlewareConfigBase64=e30%3D! ***!
+  \****************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   config: () => (/* binding */ config),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__),\n/* harmony export */   routeModule: () => (/* binding */ routeModule)\n/* harmony export */ });\n/* harmony import */ var next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/dist/server/future/route-modules/pages-api/module.compiled */ \"(api)/./node_modules/next/dist/server/future/route-modules/pages-api/module.compiled.js\");\n/* harmony import */ var next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var next_dist_server_future_route_kind__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! next/dist/server/future/route-kind */ \"(api)/./node_modules/next/dist/server/future/route-kind.js\");\n/* harmony import */ var next_dist_build_templates_helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! next/dist/build/templates/helpers */ \"(api)/./node_modules/next/dist/build/templates/helpers.js\");\n/* harmony import */ var _pages_api_users_ts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages\\api\\users.ts */ \"(api)/./pages/api/users.ts\");\n\n\n\n// Import the userland code.\n\n// Re-export the handler (should be the default export).\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,next_dist_build_templates_helpers__WEBPACK_IMPORTED_MODULE_2__.hoist)(_pages_api_users_ts__WEBPACK_IMPORTED_MODULE_3__, \"default\"));\n// Re-export config.\nconst config = (0,next_dist_build_templates_helpers__WEBPACK_IMPORTED_MODULE_2__.hoist)(_pages_api_users_ts__WEBPACK_IMPORTED_MODULE_3__, \"config\");\n// Create and export the route module that will be consumed.\nconst routeModule = new next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0__.PagesAPIRouteModule({\n    definition: {\n        kind: next_dist_server_future_route_kind__WEBPACK_IMPORTED_MODULE_1__.RouteKind.PAGES_API,\n        page: \"/api/users\",\n        pathname: \"/api/users\",\n        // The following aren't used in production.\n        bundlePath: \"\",\n        filename: \"\"\n    },\n    userland: _pages_api_users_ts__WEBPACK_IMPORTED_MODULE_3__\n});\n\n//# sourceMappingURL=pages-api.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2J1aWxkL3dlYnBhY2svbG9hZGVycy9uZXh0LXJvdXRlLWxvYWRlci9pbmRleC5qcz9raW5kPVBBR0VTX0FQSSZwYWdlPSUyRmFwaSUyRnVzZXJzJnByZWZlcnJlZFJlZ2lvbj0mYWJzb2x1dGVQYWdlUGF0aD0uJTJGcGFnZXMlNUNhcGklNUN1c2Vycy50cyZtaWRkbGV3YXJlQ29uZmlnQmFzZTY0PWUzMCUzRCEiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7QUFBc0c7QUFDdkM7QUFDTDtBQUMxRDtBQUNtRDtBQUNuRDtBQUNBLGlFQUFlLHdFQUFLLENBQUMsZ0RBQVEsWUFBWSxFQUFDO0FBQzFDO0FBQ08sZUFBZSx3RUFBSyxDQUFDLGdEQUFRO0FBQ3BDO0FBQ08sd0JBQXdCLGdIQUFtQjtBQUNsRDtBQUNBLGNBQWMseUVBQVM7QUFDdkI7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEtBQUs7QUFDTCxZQUFZO0FBQ1osQ0FBQzs7QUFFRCIsInNvdXJjZXMiOlsid2VicGFjazovL3dlYi8/MjEyYiJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBQYWdlc0FQSVJvdXRlTW9kdWxlIH0gZnJvbSBcIm5leHQvZGlzdC9zZXJ2ZXIvZnV0dXJlL3JvdXRlLW1vZHVsZXMvcGFnZXMtYXBpL21vZHVsZS5jb21waWxlZFwiO1xuaW1wb3J0IHsgUm91dGVLaW5kIH0gZnJvbSBcIm5leHQvZGlzdC9zZXJ2ZXIvZnV0dXJlL3JvdXRlLWtpbmRcIjtcbmltcG9ydCB7IGhvaXN0IH0gZnJvbSBcIm5leHQvZGlzdC9idWlsZC90ZW1wbGF0ZXMvaGVscGVyc1wiO1xuLy8gSW1wb3J0IHRoZSB1c2VybGFuZCBjb2RlLlxuaW1wb3J0ICogYXMgdXNlcmxhbmQgZnJvbSBcIi4vcGFnZXNcXFxcYXBpXFxcXHVzZXJzLnRzXCI7XG4vLyBSZS1leHBvcnQgdGhlIGhhbmRsZXIgKHNob3VsZCBiZSB0aGUgZGVmYXVsdCBleHBvcnQpLlxuZXhwb3J0IGRlZmF1bHQgaG9pc3QodXNlcmxhbmQsIFwiZGVmYXVsdFwiKTtcbi8vIFJlLWV4cG9ydCBjb25maWcuXG5leHBvcnQgY29uc3QgY29uZmlnID0gaG9pc3QodXNlcmxhbmQsIFwiY29uZmlnXCIpO1xuLy8gQ3JlYXRlIGFuZCBleHBvcnQgdGhlIHJvdXRlIG1vZHVsZSB0aGF0IHdpbGwgYmUgY29uc3VtZWQuXG5leHBvcnQgY29uc3Qgcm91dGVNb2R1bGUgPSBuZXcgUGFnZXNBUElSb3V0ZU1vZHVsZSh7XG4gICAgZGVmaW5pdGlvbjoge1xuICAgICAgICBraW5kOiBSb3V0ZUtpbmQuUEFHRVNfQVBJLFxuICAgICAgICBwYWdlOiBcIi9hcGkvdXNlcnNcIixcbiAgICAgICAgcGF0aG5hbWU6IFwiL2FwaS91c2Vyc1wiLFxuICAgICAgICAvLyBUaGUgZm9sbG93aW5nIGFyZW4ndCB1c2VkIGluIHByb2R1Y3Rpb24uXG4gICAgICAgIGJ1bmRsZVBhdGg6IFwiXCIsXG4gICAgICAgIGZpbGVuYW1lOiBcIlwiXG4gICAgfSxcbiAgICB1c2VybGFuZFxufSk7XG5cbi8vIyBzb3VyY2VNYXBwaW5nVVJMPXBhZ2VzLWFwaS5qcy5tYXAiXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(api)/./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fusers&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cusers.ts&middlewareConfigBase64=e30%3D!\n");
+
+/***/ }),
+
+/***/ "(api)/./lib/sheetsClient.ts":
+/*!*****************************!*\
+  !*** ./lib/sheetsClient.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   getUsers: () => (/* binding */ getUsers),\n/* harmony export */   updateUserRole: () => (/* binding */ updateUserRole)\n/* harmony export */ });\n/* harmony import */ var _src_sheets__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/sheets */ \"(api)/../src/sheets.js\");\n/* harmony import */ var _src_sheets__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_src_sheets__WEBPACK_IMPORTED_MODULE_0__);\n\nasync function getUsers(sheets) {\n    const res = await sheets.spreadsheets.values.get({\n        spreadsheetId: process.env.SPREADSHEET_ID,\n        range: process.env.SHEET_NAME || \"Sheet1\"\n    });\n    return res.data.values || [];\n}\nasync function updateUserRole(userId, role) {\n    const updatedAt = new Date().toISOString();\n    await (0,_src_sheets__WEBPACK_IMPORTED_MODULE_0__.upsertUserProfile)({\n        timestamp: updatedAt,\n        botName: \"\",\n        userId,\n        displayName: \"\",\n        pictureUrl: \"\",\n        role,\n        updatedAt\n    });\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi9saWIvc2hlZXRzQ2xpZW50LnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7QUFBcUQ7QUFFOUMsZUFBZUMsU0FBU0MsTUFBTTtJQUNuQyxNQUFNQyxNQUFNLE1BQU1ELE9BQU9FLFlBQVksQ0FBQ0MsTUFBTSxDQUFDQyxHQUFHLENBQUM7UUFDL0NDLGVBQWVDLFFBQVFDLEdBQUcsQ0FBQ0MsY0FBYztRQUN6Q0MsT0FBT0gsUUFBUUMsR0FBRyxDQUFDRyxVQUFVLElBQUk7SUFDbkM7SUFDQSxPQUFPVCxJQUFJVSxJQUFJLENBQUNSLE1BQU0sSUFBSSxFQUFFO0FBQzlCO0FBRU8sZUFBZVMsZUFBZUMsTUFBTSxFQUFFQyxJQUFJO0lBQy9DLE1BQU1DLFlBQVksSUFBSUMsT0FBT0MsV0FBVztJQUN4QyxNQUFNbkIsOERBQWlCQSxDQUFDO1FBQUVvQixXQUFXSDtRQUFXSSxTQUFTO1FBQUlOO1FBQVFPLGFBQWE7UUFBSUMsWUFBWTtRQUFJUDtRQUFNQztJQUFVO0FBQ3hIIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vd2ViLy4vbGliL3NoZWV0c0NsaWVudC50cz9kNjM3Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHVwc2VydFVzZXJQcm9maWxlIH0gZnJvbSAnLi4vLi4vc3JjL3NoZWV0cyc7XHJcblxyXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gZ2V0VXNlcnMoc2hlZXRzKSB7XHJcbiAgY29uc3QgcmVzID0gYXdhaXQgc2hlZXRzLnNwcmVhZHNoZWV0cy52YWx1ZXMuZ2V0KHtcclxuICAgIHNwcmVhZHNoZWV0SWQ6IHByb2Nlc3MuZW52LlNQUkVBRFNIRUVUX0lELFxyXG4gICAgcmFuZ2U6IHByb2Nlc3MuZW52LlNIRUVUX05BTUUgfHwgJ1NoZWV0MScsXHJcbiAgfSk7XHJcbiAgcmV0dXJuIHJlcy5kYXRhLnZhbHVlcyB8fCBbXTtcclxufVxyXG5cclxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHVwZGF0ZVVzZXJSb2xlKHVzZXJJZCwgcm9sZSkge1xyXG4gIGNvbnN0IHVwZGF0ZWRBdCA9IG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKTtcclxuICBhd2FpdCB1cHNlcnRVc2VyUHJvZmlsZSh7IHRpbWVzdGFtcDogdXBkYXRlZEF0LCBib3ROYW1lOiAnJywgdXNlcklkLCBkaXNwbGF5TmFtZTogJycsIHBpY3R1cmVVcmw6ICcnLCByb2xlLCB1cGRhdGVkQXQgfSk7XHJcbn1cclxuIl0sIm5hbWVzIjpbInVwc2VydFVzZXJQcm9maWxlIiwiZ2V0VXNlcnMiLCJzaGVldHMiLCJyZXMiLCJzcHJlYWRzaGVldHMiLCJ2YWx1ZXMiLCJnZXQiLCJzcHJlYWRzaGVldElkIiwicHJvY2VzcyIsImVudiIsIlNQUkVBRFNIRUVUX0lEIiwicmFuZ2UiLCJTSEVFVF9OQU1FIiwiZGF0YSIsInVwZGF0ZVVzZXJSb2xlIiwidXNlcklkIiwicm9sZSIsInVwZGF0ZWRBdCIsIkRhdGUiLCJ0b0lTT1N0cmluZyIsInRpbWVzdGFtcCIsImJvdE5hbWUiLCJkaXNwbGF5TmFtZSIsInBpY3R1cmVVcmwiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(api)/./lib/sheetsClient.ts\n");
+
+/***/ }),
+
+/***/ "(api)/./pages/api/users.ts":
+/*!****************************!*\
+  !*** ./pages/api/users.ts ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ handler)\n/* harmony export */ });\n/* harmony import */ var _lib_sheetsClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/sheetsClient */ \"(api)/./lib/sheetsClient.ts\");\n\nasync function handler(req, res) {\n    const users = await (0,_lib_sheetsClient__WEBPACK_IMPORTED_MODULE_0__.getUsers)();\n    res.status(200).json(users.map((u)=>({\n            userId: u[2],\n            displayName: u[3],\n            pictureUrl: u[4],\n            role: u[5]\n        })));\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi9wYWdlcy9hcGkvdXNlcnMudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7QUFBa0Q7QUFFbkMsZUFBZUMsUUFBUUMsR0FBRyxFQUFFQyxHQUFHO0lBQzVDLE1BQU1DLFFBQVEsTUFBTUosMkRBQVFBO0lBQzVCRyxJQUFJRSxNQUFNLENBQUMsS0FBS0MsSUFBSSxDQUFDRixNQUFNRyxHQUFHLENBQUNDLENBQUFBLElBQU07WUFDbkNDLFFBQVFELENBQUMsQ0FBQyxFQUFFO1lBQ1pFLGFBQWFGLENBQUMsQ0FBQyxFQUFFO1lBQ2pCRyxZQUFZSCxDQUFDLENBQUMsRUFBRTtZQUNoQkksTUFBTUosQ0FBQyxDQUFDLEVBQUU7UUFDWjtBQUNGIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vd2ViLy4vcGFnZXMvYXBpL3VzZXJzLnRzPzg4NzIiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgZ2V0VXNlcnMgfSBmcm9tICcuLi8uLi9saWIvc2hlZXRzQ2xpZW50JztcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGFzeW5jIGZ1bmN0aW9uIGhhbmRsZXIocmVxLCByZXMpIHtcclxuICBjb25zdCB1c2VycyA9IGF3YWl0IGdldFVzZXJzKCk7XHJcbiAgcmVzLnN0YXR1cygyMDApLmpzb24odXNlcnMubWFwKHUgPT4gKHtcclxuICAgIHVzZXJJZDogdVsyXSxcclxuICAgIGRpc3BsYXlOYW1lOiB1WzNdLFxyXG4gICAgcGljdHVyZVVybDogdVs0XSxcclxuICAgIHJvbGU6IHVbNV1cclxuICB9KSkpO1xyXG59XHJcbiJdLCJuYW1lcyI6WyJnZXRVc2VycyIsImhhbmRsZXIiLCJyZXEiLCJyZXMiLCJ1c2VycyIsInN0YXR1cyIsImpzb24iLCJtYXAiLCJ1IiwidXNlcklkIiwiZGlzcGxheU5hbWUiLCJwaWN0dXJlVXJsIiwicm9sZSJdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(api)/./pages/api/users.ts\n");
+
+/***/ })
+
+};
+;
+
+// load runtime
+var __webpack_require__ = require("../../webpack-api-runtime.js");
+__webpack_require__.C(exports);
+var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
+var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next"], () => (__webpack_exec__("(api)/./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fusers&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cusers.ts&middlewareConfigBase64=e30%3D!")));
+module.exports = __webpack_exports__;
+
+})();
