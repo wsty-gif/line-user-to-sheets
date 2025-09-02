@@ -85,11 +85,13 @@ async function handleEvent(event, client, botName) {
 
     // スプレッドシートに登録
     await upsertUserProfile({
-      timestamp: new Date().toISOString(),
-      botName,
-      userId,
-      displayName,
-      pictureUrl,
+      user: {
+        timestamp: new Date().toISOString(),
+        botName,
+        userId,
+        displayName,
+        pictureUrl,
+      }
     });
 
     console.log(`[${botName}] 友だちID: ${userId}, displayName: ${displayName}`);
