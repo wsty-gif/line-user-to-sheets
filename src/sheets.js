@@ -45,7 +45,8 @@ async function ensureHeaderRow() {
 }
 
 // ユーザープロファイルを追加または上書き
-async function upsertUserProfile({ timestamp, botName, userId, displayName, pictureUrl }) {
+async function upsertUserProfile({ user }) {
+  const { timestamp, botName, userId, displayName, pictureUrl } = user;
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
     range: DATA_RANGE,
