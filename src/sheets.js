@@ -44,18 +44,17 @@ async function upsertUserProfile({ timestamp, botName, userId, displayName, pict
 
   const rows = res.data.values || [];
   let targetRow = -1;
+  let currentRole = 'user'; // デフォルト
 
-  const safeDisplayName = (displayName || '').trim();
-
-  // D列（名前）で検索
   for (let i = 1; i < rows.length; i++) {
-    if ((rows[i][3] || '').trim() === safeDisplayName) {
+    if (rows[i][2]?.trim() === userId) { // C列 = userId
       targetRow = i + 1;
+      currentRole = rows[i][5] || 'user'; // F列 = role を保持
       break;
     }
   }
 
-  const record = [[timestamp, botName, userId, safeDisplayName, pictureUrl || '', 'user', new Date().toISOString()]];
+  const record = [[timestamp, botName, userId, displayName, pictureUrl, currentRole, new Date().toISOString()]];
 
   if (targetRow === -1) {
     await sheets.spreadsheets.values.append({
@@ -74,6 +73,7 @@ async function upsertUserProfile({ timestamp, botName, userId, displayName, pict
     });
   }
 }
+
 
 // ユーザー情報を取得（権限確認用）
 async function getUserRecord(userId) {
