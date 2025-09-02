@@ -2,10 +2,7 @@ require('dotenv').config();
 const { google } = require('googleapis');
 const { GoogleAuth } = require('google-auth-library');
 
-// GOOGLE_CREDENTIALS をオブジェクトに変換
 const googleCredentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-
-// private_key の改行を実際の改行に置換
 googleCredentials.private_key = googleCredentials.private_key.replace(/\\n/g, '\n');
 
 const auth = new GoogleAuth({
@@ -14,39 +11,32 @@ const auth = new GoogleAuth({
 });
 
 const sheets = google.sheets({ version: 'v4', auth });
-
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SHEET_NAME = process.env.SHEET_NAME || 'Sheet1';
-
-const DATA_RANGE = `${SHEET_NAME}!A:G`; // timestamp, botName, userId, displayName, pictureUrl, 'role', 'update'
+const DATA_RANGE = `${SHEET_NAME}!A:G`;
 
 // ヘッダー行を保証
 async function ensureHeaderRow() {
-  try {
-    const res = await sheets.spreadsheets.values.get({
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${SHEET_NAME}!A1:G1`,
+  });
+
+  const values = res.data.values;
+  const expected = ['timestamp', 'botName', 'userId', 'displayName', 'pictureUrl', 'role', 'update'];
+
+  if (!values || !values[0] || values[0].join('') === '') {
+    await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: `${SHEET_NAME}!A1:G1`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [expected] },
     });
-
-    const values = res.data.values;
-    const expected = ['timestamp', 'botName', 'userId', 'displayName', 'pictureUrl', 'role', 'update'];
-
-    if (!values || !values[0] || values[0].length === 0 || values[0].join('') === '') {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_NAME}!A1:G1`,
-        valueInputOption: 'RAW',
-        requestBody: { values: [expected] },
-      });
-    }
-  } catch (e) {
-    throw e;
   }
 }
 
 // ユーザープロファイルを追加または上書き
-async function upsertUserProfile({ user }) {
-  const { timestamp, botName, userId, displayName, pictureUrl } = user;
+async function upsertUserProfile({ timestamp, botName, userId, displayName, pictureUrl }) {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
     range: DATA_RANGE,
@@ -55,18 +45,19 @@ async function upsertUserProfile({ user }) {
   const rows = res.data.values || [];
   let targetRow = -1;
 
-  // rows[i][3] が D列（名前）
+  const safeDisplayName = (displayName || '').trim();
+
+  // D列（名前）で検索
   for (let i = 1; i < rows.length; i++) {
-    if (rows[i][3]?.trim() === user.name.trim()) {
+    if ((rows[i][3] || '').trim() === safeDisplayName) {
       targetRow = i + 1;
       break;
     }
   }
 
-  const record = [[timestamp, botName, userId, displayName, pictureUrl, 'user', new Date().toISOString()]];
+  const record = [[timestamp, botName, userId, safeDisplayName, pictureUrl || '', 'user', new Date().toISOString()]];
 
   if (targetRow === -1) {
-    // 追記
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
       range: DATA_RANGE,
@@ -75,7 +66,6 @@ async function upsertUserProfile({ user }) {
       requestBody: { values: record },
     });
   } else {
-    // 上書き
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: `${SHEET_NAME}!A${targetRow}:G${targetRow}`,
@@ -85,4 +75,28 @@ async function upsertUserProfile({ user }) {
   }
 }
 
-module.exports = { ensureHeaderRow, upsertUserProfile };
+// ユーザー情報を取得（権限確認用）
+async function getUserRecord(userId) {
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: DATA_RANGE,
+  });
+
+  const rows = res.data.values || [];
+  for (let i = 1; i < rows.length; i++) {
+    if ((rows[i][2] || '') === userId) {
+      return {
+        timestamp: rows[i][0],
+        botName: rows[i][1],
+        userId: rows[i][2],
+        displayName: rows[i][3],
+        pictureUrl: rows[i][4],
+        role: rows[i][5] || 'user',
+        update: rows[i][6],
+      };
+    }
+  }
+  return null;
+}
+
+module.exports = { ensureHeaderRow, upsertUserProfile, getUserRecord };

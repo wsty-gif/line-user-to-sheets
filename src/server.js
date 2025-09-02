@@ -85,19 +85,17 @@ async function handleEvent(event, client, botName) {
 
     // スプレッドシートに登録
     await upsertUserProfile({
-      user: {
-        timestamp: new Date().toISOString(),
-        botName,
-        userId,
-        displayName,
-        pictureUrl,
-      }
+      timestamp: new Date().toISOString(),
+      botName,
+      userId,
+      displayName,
+      pictureUrl,
     });
 
     console.log(`[${botName}] 友だちID: ${userId}, displayName: ${displayName}`);
 
-    // ここからリッチメニュー割り当て
-    const userRecord = await getUserRecord(userId); // スプレッドシートから権限取得
+    // ▼ リッチメニュー割り当て
+    const userRecord = await getUserRecord(userId); 
     let richMenuId;
 
     if (userRecord?.role === 'admin') {
@@ -115,7 +113,6 @@ async function handleEvent(event, client, botName) {
     console.error(`[handleEvent][${botName}] error:`, e);
   }
 }
-
 
 // サーバー起動
 const PORT = process.env.PORT || 3000;
