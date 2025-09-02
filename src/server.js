@@ -1,7 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const line = require('@line/bot-sdk');
-const { ensureHeaderRow, upsertUserProfile } = require('./sheets');
+const { ensureHeaderRow, upsertUserProfile, getUserRecord } = require('./sheets');
+
 
 const bots = [
   {
