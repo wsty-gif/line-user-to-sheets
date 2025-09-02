@@ -7,8 +7,8 @@ import path from "path";
 config({ path: path.resolve(__dirname, "../web/.env.local") });
 
 const client = new Client({
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_3 ?? "",
-  channelSecret: process.env.CHANNEL_SECRET_3 ?? "",
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_1 ?? "",
+  channelSecret: process.env.CHANNEL_SECRET_1 ?? "",
 });
 
 async function listRichMenus() {

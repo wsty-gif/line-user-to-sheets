@@ -10,8 +10,8 @@ const RICHMENU_IDS = {
 };
 
 // ここではアカウントごとに環境変数を切り替え
-const CHANNEL_ACCESS_TOKEN = process.env.CHANNEL_ACCESS_TOKEN_3!;
-const CHANNEL_SECRET = process.env.CHANNEL_SECRET_3!;
+const CHANNEL_ACCESS_TOKEN = process.env.CHANNEL_ACCESS_TOKEN_1!;
+const CHANNEL_SECRET = process.env.CHANNEL_SECRET_1!;
 
 const client = new Client({
   channelAccessToken: CHANNEL_ACCESS_TOKEN,
