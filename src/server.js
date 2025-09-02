@@ -107,6 +107,7 @@ async function handleEvent(event, client, botName) {
 console.log(`[${botName}] userId=${userId} role=${userRecord?.role} 割り当て予定リッチメニューID=${richMenuId}`);
 
     if (richMenuId) {
+      await client.unlinkRichMenuFromUser(userId);
       await client.linkRichMenuToUser(userId, richMenuId);
       console.log(`[${botName}] リッチメニュー割り当て完了: ${richMenuId}`);
     }
