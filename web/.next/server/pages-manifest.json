@@ -2,8 +2,5 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/api/get-botname": "pages/api/get-botname.js",
-  "/api/users": "pages/api/users.js",
-  "/api/updateUsers": "pages/api/updateUsers.js"
+  "/": "pages/index.js"
 }

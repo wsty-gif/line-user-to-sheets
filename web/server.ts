@@ -8,8 +8,8 @@ const app = express();
 app.use(express.json());
 
 const client = new Client({
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_1 ?? "",
-  channelSecret: process.env.CHANNEL_SECRET_1 ?? "",
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_3 ?? "",
+  channelSecret: process.env.CHANNEL_SECRET_3 ?? "",
 });
 
 // 権限ごとのリッチメニューID
