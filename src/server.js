@@ -83,6 +83,7 @@ async function handleEvent(event, client, botName) {
     const displayName = profile.displayName || '';
     const pictureUrl = profile.pictureUrl || '';
 
+    // スプレッドシートに登録
     await upsertUserProfile({
       timestamp: new Date().toISOString(),
       botName,
@@ -92,10 +93,27 @@ async function handleEvent(event, client, botName) {
     });
 
     console.log(`[${botName}] 友だちID: ${userId}, displayName: ${displayName}`);
+
+    // ここからリッチメニュー割り当て
+    const userRecord = await getUserRecord(userId); // スプレッドシートから権限取得
+    let richMenuId;
+
+    if (userRecord?.role === 'admin') {
+      richMenuId = process.env.RICH_MENU_ADMIN_ID_1;
+    } else {
+      richMenuId = process.env.RICH_MENU_USER_ID_1;
+    }
+
+    if (richMenuId) {
+      await client.linkRichMenuToUser(userId, richMenuId);
+      console.log(`[${botName}] リッチメニュー割り当て完了: ${richMenuId}`);
+    }
+
   } catch (e) {
     console.error(`[handleEvent][${botName}] error:`, e);
   }
 }
+
 
 // サーバー起動
 const PORT = process.env.PORT || 3000;

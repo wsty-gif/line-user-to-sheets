@@ -54,9 +54,9 @@ async function upsertUserProfile({ timestamp, botName, userId, displayName, pict
   const rows = res.data.values || [];
   let targetRow = -1;
 
+  // rows[i][3] が D列（名前）
   for (let i = 1; i < rows.length; i++) {
-    // B列(botName)とC列(userId)でユニーク判定
-    if (rows[i][1] === botName && rows[i][2] === userId) {
+    if (rows[i][3]?.trim() === user.name.trim()) {
       targetRow = i + 1;
       break;
     }

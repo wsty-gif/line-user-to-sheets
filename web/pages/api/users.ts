@@ -4,7 +4,13 @@ import { getUsers } from "../../src/sheets";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const users = await getUsers();
+    const rows = await getUsers();
+    const users = rows.map(row => ({
+      id: row.userId,
+      botName: row.botName,
+      name: row.name,
+      role: row.role,
+    }));
     res.status(200).json({ success: true, users });
   } catch (err) {
     console.error(err);

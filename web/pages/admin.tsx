@@ -10,14 +10,6 @@ export default function AdminPage() {
       .catch(console.error);
   }, []);
 
-  // ドロップダウン変更時に state を更新
-  const handleRoleChange = (rowIndex: number, value: string) => {
-    if (!users) return;
-    const updated = [...users];
-    updated[rowIndex][1] = value; // 2列目(role)を更新
-    setUsers(updated);
-  };
-
   return (
     <div style={{ padding: 20 }}>
       <h1>管理者画面</h1>
@@ -29,21 +21,7 @@ export default function AdminPage() {
           <tbody>
             {users.slice(1).map((row, i) => (
               <tr key={i}>
-                {row.map((cell, j) =>
-                  j === 1 ? ( // 2列目だけドロップダウンに
-                    <td key={j}>
-                      <select
-                        value={cell}
-                        onChange={(e) => handleRoleChange(i + 1, e.target.value)}
-                      >
-                        <option value="user">user</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    </td>
-                  ) : (
-                    <td key={j}>{cell}</td>
-                  )
-                )}
+                {row.map((cell, j) => <td key={j}>{cell}</td>)}
               </tr>
             ))}
           </tbody>
