@@ -1,23 +1,52 @@
-// scripts/listRichMenus.ts
-import { config } from "dotenv";
+// pages/api/listRichMenus.ts
+import { NextApiRequest, NextApiResponse } from "next";
 import { Client } from "@line/bot-sdk";
+import { config } from "dotenv";
 import path from "path";
 
-// web/.env.local を読むように明示する
 config({ path: path.resolve(__dirname, "../web/.env.local") });
 
-const client = new Client({
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_3 ?? "",
-  channelSecret: process.env.CHANNEL_SECRET_3 ?? "",
-});
+// botName から account を判定
+function getAccountByBotName(botName: string): number {
+  switch (botName) {
+    case "株式会社TETOTE":
+      return 1;
+    case "mokara bridal etc.":
+      return 3;
 
-async function listRichMenus() {
-  try {
-    const res = await client.getRichMenuList();
-    console.log("RichMenus:", JSON.stringify(res, null, 2));
-  } catch (err) {
-    console.error("Error fetching rich menus:", err);
+    // アカウント追加時修正箇所
+    // case "mokara bridal etc.":
+    // return 3;
+    default:
+      throw new Error(`Unknown botName: ${botName}`);
   }
 }
 
-listRichMenus();
+// Client 作成
+function getClient(account: number) {
+  const channelAccessToken = process.env[`CHANNEL_ACCESS_TOKEN_${account}`];
+  const channelSecret = process.env[`CHANNEL_SECRET_${account}`];
+
+  if (!channelAccessToken || !channelSecret) {
+    throw new Error(`Channel token/secret not found for account ${account}`);
+  }
+
+  return new Client({ channelAccessToken, channelSecret });
+}
+
+// API ハンドラー
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const botName = req.query.botName as string;
+  if (!botName) return res.status(400).json({ success: false, error: "botName is required" });
+
+  try {
+    const account = getAccountByBotName(botName);
+    const client = getClient(account);
+
+    const richMenus = await client.getRichMenuList();
+    return res.status(200).json({ success: true, richMenus });
+  } catch (err: any) {
+    console.error(err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}

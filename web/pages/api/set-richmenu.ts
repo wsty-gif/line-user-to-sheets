@@ -3,39 +3,72 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Client } from "@line/bot-sdk";
 import { getUsers } from "../../src/sheets";
 
-// 事前に作成したリッチメニューID
-const RICHMENU_IDS = {
-  user: process.env.USER_RICHMENU_ID_3,   // 一般ユーザー用
-  admin: process.env.ADMIN_RICHMENU_ID_3, // 管理者用
-};
+// botName → account番号を判定
+function getAccountByBotName(botName: string): number {
+  switch (botName) {
+    case "株式会社TETOTE":
+      return 1;
+    case "mokara bridal etc.":
+      return 3;
 
-// ここではアカウントごとに環境変数を切り替え
-const CHANNEL_ACCESS_TOKEN = process.env.CHANNEL_ACCESS_TOKEN_3!;
-const CHANNEL_SECRET = process.env.CHANNEL_SECRET_3!;
+    // アカウント追加時修正箇所
+    // case "mokara bridal etc.":
+    //   return 3;
 
-const client = new Client({
-  channelAccessToken: CHANNEL_ACCESS_TOKEN,
-  channelSecret: CHANNEL_SECRET,
-});
+    default:
+      throw new Error(`Unknown botName: ${botName}`);
+  }
+}
+
+// Client 作成
+function getClient(account: number) {
+  const channelAccessToken = process.env[`CHANNEL_ACCESS_TOKEN_${account}`];
+  const channelSecret = process.env[`CHANNEL_SECRET_${account}`];
+
+  if (!channelAccessToken || !channelSecret) {
+    throw new Error(`Channel token/secret not found for account ${account}`);
+  }
+
+  return new Client({ channelAccessToken, channelSecret });
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const users = await getUsers(); // スプレッドシートから取得
-    // リクエストに userId があればそのユーザーの role を取得
-    const { userId } = req.query;
+    const { botName, userId } = req.query;
+
+    if (!botName || typeof botName !== "string") {
+      return res.status(400).json({ success: false, error: "botName is required" });
+    }
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({ success: false, error: "userId is required" });
     }
 
-    const user = users.find(u => u.userId === userId);
+    // botNameからaccount判定
+    const account = getAccountByBotName(botName);
+
+    // Clientを生成
+    const client = getClient(account);
+
+    // スプレッドシートからユーザー一覧を取得
+    const users = await getUsers();
+    const user = users.find((u) => u.userId === userId);
     if (!user) return res.status(404).json({ success: false, error: "User not found" });
 
-    const richMenuId = RICHMENU_IDS[user.role as "user" | "admin"];
+    // roleに応じたリッチメニューIDを可変で選択
+    const richMenuId =
+      user.role === "admin"
+        ? process.env[`ADMIN_RICHMENU_ID_${account}`]
+        : process.env[`USER_RICHMENU_ID_${account}`];
+
+    if (!richMenuId) {
+      throw new Error(`RichMenu ID not found for account ${account}, role ${user.role}`);
+    }
+
     await client.linkRichMenuToUser(userId, richMenuId);
 
     return res.status(200).json({ success: true, richMenuId });
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    return res.status(500).json({ success: false, error: "Failed to set rich menu" });
+    return res.status(500).json({ success: false, error: err.message });
   }
 }

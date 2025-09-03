@@ -6,6 +6,15 @@ export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [botName, setBotName] = useState("");
 
+  // API 呼び出し
+  useEffect(() => {
+    if (!botName) return;
+
+    fetch(`/api/listRichMenus?botName=${encodeURIComponent(botName)}`)
+      .then(res => res.json())
+      .then(data => console.log(data));
+  }, [botName]);
+
   // ログイン中のbotNameを取得（例として固定）
   useEffect(() => {
     // まず botName を取得
