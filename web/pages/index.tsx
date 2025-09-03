@@ -5,46 +5,75 @@ type User = { id: string; name: string; role: string; botName: string };
 export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [botName, setBotName] = useState("");
+  const [account, setAccount] = useState<number | null>(null);
+
+  // botName → account 判定関数
+  function getAccountFromBotName(botName: string): number | null {
+    console.log('bbb',botName);
+    switch (botName) {
+      case "株式会社TETOTE":
+        return 1;
+      case "mokara bridal etc.":
+        return 3;
+      // 追加アカウントがあればここに追記
+      // case "XXXXX": return 4;
+      default:
+        return null;
+    }
+  }
+
+  // ログイン中の botName を取得
+  useEffect(() => {
+    console.log('aaa',account);
+    fetch(`/api/get-botname?account=${account || 1}`) // ← account 固定せず botName を返す API にするのがおすすめ
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setBotName(data.botName);
+          const acc = getAccountFromBotName(data.botName);
+          setAccount(acc);
+        }
+      });
+  }, []);
 
   // API 呼び出し
   useEffect(() => {
     if (!botName) return;
-
     fetch(`/api/listRichMenus?botName=${encodeURIComponent(botName)}`)
       .then(res => res.json())
       .then(data => console.log(data));
   }, [botName]);
 
   // ログイン中のbotNameを取得（例として固定）
-  useEffect(() => {
-    // まず botName を取得
-    fetch("/api/get-botname?account=3") // 仮に3を固定して最初に取る
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setBotName(data.botName);
+  // useEffect(() => {
+  //   // まず botName を取得
+  //   fetch("/api/get-botname?account=3") // 仮に3を固定して最初に取る
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       if (data.success) {
+  //         setBotName(data.botName);
 
-          // botName に応じて account を決定
-          let account = 0;
-          if (data.botName === "株式会社TETOTE") {
-            account = 1;
-          } else if (data.botName === "mokara bridal etc.") {
-            account = 3;
-          }
-          // アカウント追加時修正箇所
-          // else if (botName == 'XXXXX') {
-          //   account = 4;
-          // } 
+  //         // botName に応じて account を決定
+  //         let account = 0;
+  //         if (data.botName === "株式会社TETOTE") {
+  //           account = 1;
+  //         } else if (data.botName === "mokara bridal etc.") {
+  //           account = 3;
+  //         }
+  //         // アカウント追加時修正箇所
+  //         // else if (botName == 'XXXXX') {
+  //         //   account = 4;
+  //         // } 
 
-          // account を使って再度 fetch
-          fetch("/api/get-botname?account=" + account)
-            .then(res => res.json())
-            .then(data2 => {
-              if (data2.success) setBotName(data2.botName);
-            });
-        }
-      });
-  }, []);
+  //         // account を使って再度 fetch
+  //         fetch("/api/get-botname?account=" + account)
+  //           .then(res => res.json())
+  //           .then(data2 => {
+  //             if (data2.success) setBotName(data2.botName);
+  //           });
+  //       }
+  //     });
+  // }, []);
 
   // ユーザー一覧取得
   useEffect(() => {
