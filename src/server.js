@@ -3,7 +3,7 @@ const express = require('express');
 const line = require('@line/bot-sdk');
 const { ensureHeaderRow, upsertUserProfile, getUserRecord } = require('./sheets');
 
-
+// アカウント追加時修正箇所
 const bots = [
   {
     id: process.env.WEBHOOK_PATH_1,
@@ -29,6 +29,14 @@ const bots = [
       channelSecret: process.env.CHANNEL_SECRET_3,
     },
   },
+  // {
+  //   id: process.env.WEBHOOK_PATH_3,
+  //   name: 'mokara bridal etc.',
+  //   config: {
+  //     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_3,
+  //     channelSecret: process.env.CHANNEL_SECRET_3,
+  //   },
+  // },
 ];
 
 const app = express();
@@ -110,12 +118,12 @@ async function handleEvent(event, client, botName) {
     let account;
 
     // どの公式アカウントか判定
+    // アカウント追加時修正箇所
     if (botName == '株式会社TETOTE') {
       account = 1;
     } else if (botName == 'mokara bridal etc.') {
       account = 3;
     }
-    // アカウント追加時修正箇所
     // else if (botName == '') {
     //   account = 4;
     // }

@@ -9,14 +9,17 @@ export default function Home() {
 
   // botName → account 判定関数
   function getAccountFromBotName(botName: string): number | null {
-    console.log('bbb',botName);
+    // console.log('bbb',botName);
+    // アカウント追加時修正箇所
     switch (botName) {
       case "株式会社TETOTE":
         return 1;
       case "mokara bridal etc.":
         return 3;
-      // 追加アカウントがあればここに追記
-      // case "XXXXX": return 4;
+
+      // case "XXXXX":
+      // return 4;
+
       default:
         return null;
     }
@@ -111,12 +114,12 @@ export default function Home() {
 
     for (const user of filteredUsers) {
       let account = 0;
+      // アカウント追加時修正箇所
       if (user.botName === "株式会社TETOTE") {
         account = 1;
       } else if (user.botName === "mokara bridal etc.") {
         account = 3;
       }
-      // アカウント追加時修正箇所
       // else if (botName == 'XXXXX') {
       //   account = 4;
       // } 

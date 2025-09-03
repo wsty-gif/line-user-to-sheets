@@ -6,12 +6,12 @@ import { getUsers } from "../../src/sheets";
 // botName → account番号を判定
 function getAccountByBotName(botName: string): number {
   switch (botName) {
+    // アカウント追加時修正箇所
     case "株式会社TETOTE":
       return 1;
     case "mokara bridal etc.":
       return 3;
 
-    // アカウント追加時修正箇所
     // case "mokara bridal etc.":
     //   return 3;
 
