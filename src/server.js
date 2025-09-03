@@ -21,6 +21,14 @@ const bots = [
       channelSecret: process.env.CHANNEL_SECRET_2,
     },
   },
+  {
+    id: process.env.WEBHOOK_PATH_3,
+    name: 'mokara bridal etc.',
+    config: {
+      channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_3,
+      channelSecret: process.env.CHANNEL_SECRET_3,
+    },
+  },
 ];
 
 const app = express();
