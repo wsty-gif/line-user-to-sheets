@@ -109,9 +109,9 @@ async function handleEvent(event, client, botName) {
     let richMenuId;
 
     if (userRecord?.role === 'admin') {
-      richMenuId = process.env.ADMIN_RICHMENU_ID_1;
+      richMenuId = process.env.ADMIN_RICHMENU_ID_3;
     } else {
-      richMenuId = process.env.USER_RICHMENU_ID_1;
+      richMenuId = process.env.USER_RICHMENU_ID_3;
     }
 console.log(`[${botName}] userId=${userId} role=${userRecord?.role} 割り当て予定リッチメニューID=${richMenuId}`);
 
