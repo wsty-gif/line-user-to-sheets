@@ -22,6 +22,7 @@ export default function Home() {
           } else if (data.botName === "mokara bridal etc.") {
             account = 3;
           }
+          // アカウント追加時修正箇所
           // else if (botName == 'XXXXX') {
           //   account = 4;
           // } 
@@ -64,14 +65,13 @@ export default function Home() {
   };
 
   const filteredUsers = users.filter(u => u.botName === botName);
-
+console.log("filteredUsers", filteredUsers);
   // 更新後にリッチメニューも切り替え
   const handleUpdateAndSetMenu = async () => {
     await handleUpdate(); // まずスプレッドシートを更新
 
     // 自分のLINE userId を環境変数等から取得
     const myUserId = "U46bb39064efd2b4b75b7b4c088e5ba63";
-
     const res = await fetch(`/api/setRichMenu?userId=${myUserId}`);
     const data = await res.json();
     if (data.success) alert(`リッチメニューを ${data.richMenuId} に切替完了`);
