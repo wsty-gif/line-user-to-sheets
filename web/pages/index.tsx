@@ -6,9 +6,19 @@ export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [botName, setBotName] = useState("");
 
+  let account = 0;
+  if (botName == '株式会社TETOTE') {
+    account = 1;
+  } else if (botName == 'mokara bridal etc.') {
+    account = 3;
+  } 
+  // else if (botName == 'XXXXX') {
+  //   account = 4;
+  // } 
+
   // ログイン中のbotNameを取得（例として固定）
   useEffect(() => {
-    fetch("/api/get-botname?account=1")
+    fetch("/api/get-botname?account=" + account)
       .then(res => res.json())
       .then(data => {
         if (data.success) setBotName(data.botName);
