@@ -5,13 +5,13 @@ import { getUsers } from "../../src/sheets";
 
 // 事前に作成したリッチメニューID
 const RICHMENU_IDS = {
-  user: "richmenu-id-user",   // 一般ユーザー用
-  admin: "richmenu-id-admin", // 管理者用
+  user: process.env.USER_RICHMENU_ID_3,   // 一般ユーザー用
+  admin: process.env.ADMIN_RICHMENU_ID_3, // 管理者用
 };
 
 // ここではアカウントごとに環境変数を切り替え
-const CHANNEL_ACCESS_TOKEN = process.env.CHANNEL_ACCESS_TOKEN_1!;
-const CHANNEL_SECRET = process.env.CHANNEL_SECRET_1!;
+const CHANNEL_ACCESS_TOKEN = process.env.CHANNEL_ACCESS_TOKEN_3!;
+const CHANNEL_SECRET = process.env.CHANNEL_SECRET_3!;
 
 const client = new Client({
   channelAccessToken: CHANNEL_ACCESS_TOKEN,
