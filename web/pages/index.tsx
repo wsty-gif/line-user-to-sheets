@@ -65,17 +65,37 @@ export default function Home() {
   };
 
   const filteredUsers = users.filter(u => u.botName === botName);
-console.log("filteredUsers", filteredUsers);
+  // console.log("filteredUsers", filteredUsers);
+
   // 更新後にリッチメニューも切り替え
   const handleUpdateAndSetMenu = async () => {
     await handleUpdate(); // まずスプレッドシートを更新
 
-    // 自分のLINE userId を環境変数等から取得
-    const myUserId = "U46bb39064efd2b4b75b7b4c088e5ba63";
-    const res = await fetch(`/api/setRichMenu?userId=${myUserId}`);
-    const data = await res.json();
-    if (data.success) alert(`リッチメニューを ${data.richMenuId} に切替完了`);
-    else alert("リッチメニュー切替失敗");
+    for (const user of filteredUsers) {
+      let account = 0;
+      if (user.botName === "株式会社TETOTE") {
+        account = 1;
+      } else if (user.botName === "mokara bridal etc.") {
+        account = 3;
+      }
+      // アカウント追加時修正箇所
+      // else if (botName == 'XXXXX') {
+      //   account = 4;
+      // } 
+
+      // role に応じて割り当てるリッチメニューIDを決定
+      const richMenuId =
+        user.role === "admin"
+          ? process.env[`ADMIN_RICHMENU_ID_${account}`]
+          : process.env[`USER_RICHMENU_ID_${account}`];
+
+          // API にリクエスト
+      const res = await fetch(`/api/setRichMenu?userId=${user.id}&richMenuId=${richMenuId}`);
+      const data = await res.json();
+      if (!data.success) {
+        console.error(`ユーザー ${user.name} のリッチメニュー切替失敗`);
+      }
+    }
   };
 
   return (
