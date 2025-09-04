@@ -120,37 +120,38 @@ async function handleEvent(event, client, botName) {
     console.log(`[${botName}] 友だちID: ${userId}, displayName: ${displayName}`);
 
     // ▼ リッチメニュー割り当て
-    const userRecord = await getUserRecord(userId); 
-    await client.unlinkRichMenuFromUser(userId);
-    let richMenuId;
-    let account;
+    // スプレッドシートのroleでのメニュー切り替え機能を一時コメントで除外
+    // const userRecord = await getUserRecord(userId); 
+    // await client.unlinkRichMenuFromUser(userId);
+    // let richMenuId;
+    // let account;
 
-    // どの公式アカウントか判定
-    // アカウント追加時修正箇所
-    if (botName == '株式会社TETOTE') {
-      account = 1;
-    } else if (botName == 'mokara bridal etc.') {
-      account = 3;
-    } else if (botName == '飲食店テスト') {
-      account = 4;
-    }
-    // else if (botName == '') {
+    // // どの公式アカウントか判定
+    // // アカウント追加時修正箇所
+    // if (botName == '株式会社TETOTE') {
+    //   account = 1;
+    // } else if (botName == 'mokara bridal etc.') {
+    //   account = 3;
+    // } else if (botName == '飲食店テスト') {
     //   account = 4;
     // }
+    // // else if (botName == '') {
+    // //   account = 4;
+    // // }
 
-    // role決定　admin or user
-    if (userRecord?.role === 'admin') {
-      richMenuId = process.env[`ADMIN_RICHMENU_ID_${account}`];
-    } else {
-      richMenuId = process.env[`USER_RICHMENU_ID_${account}`];
-    }
+    // // role決定　admin or user
+    // if (userRecord?.role === 'admin') {
+    //   richMenuId = process.env[`ADMIN_RICHMENU_ID_${account}`];
+    // } else {
+    //   richMenuId = process.env[`USER_RICHMENU_ID_${account}`];
+    // }
 
-    console.log(`[${botName}] userId=${userId} role=${userRecord?.role} 割り当て予定リッチメニューID=${richMenuId}`);
+    // console.log(`[${botName}] userId=${userId} role=${userRecord?.role} 割り当て予定リッチメニューID=${richMenuId}`);
 
-    if (richMenuId) {
-      await client.linkRichMenuToUser(userId, richMenuId);
-      console.log(`[${botName}] リッチメニュー割り当て完了: ${richMenuId}`);
-    }
+    // if (richMenuId) {
+    //   await client.linkRichMenuToUser(userId, richMenuId);
+    //   console.log(`[${botName}] リッチメニュー割り当て完了: ${richMenuId}`);
+    // }
 
   } catch (e) {
     console.error(`[handleEvent][${botName}] error:`, e);
