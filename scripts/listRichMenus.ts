@@ -37,11 +37,15 @@ function getClient(account: number) {
 // API ハンドラー
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const botName = req.query.botName as string;
+    console.log('ggg',botName);
   if (!botName) return res.status(400).json({ success: false, error: "botName is required" });
 
   try {
+    console.log('ddd',botName);
     const account = getAccountByBotName(botName);
+    console.log('eee',account);
     const client = getClient(account);
+    console.log('fff',client);
 
     const richMenus = await client.getRichMenuList();
     return res.status(200).json({ success: true, richMenus });

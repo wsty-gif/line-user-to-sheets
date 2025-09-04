@@ -42,6 +42,7 @@ export default function Home() {
 
   // API 呼び出し
   useEffect(() => {
+    console.log('ccc',botName);
     if (!botName) return;
     fetch(`/api/listRichMenus?botName=${botName}`)
       .then(res => res.json())
