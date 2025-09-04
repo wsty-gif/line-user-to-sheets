@@ -14,7 +14,8 @@ function getAccountByBotName(botName: string): number {
       return 1;
     case "mokara bridal etc.":
       return 3;
-
+    case "飲食店テスト":
+      return 4;
     // case "mokara bridal etc.":
     // return 3;
     default:

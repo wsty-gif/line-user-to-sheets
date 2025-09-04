@@ -23,6 +23,8 @@ function getAccountFromBotName(botName: string): number | null {
       return 1;
     case "mokara bridal etc.":
       return 3;
+    case "飲食店テスト":
+      return 4;
     // 追加アカウントがあればここに追記
     // case "XXXXX": return 4;
     default:

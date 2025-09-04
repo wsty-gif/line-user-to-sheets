@@ -17,6 +17,8 @@ export default function Home() {
         return 1;
       case "mokara bridal etc.":
         return 3;
+      case "飲食店テスト":
+        return 4;
 
       // case "XXXXX":
       // return 4;
@@ -42,9 +44,9 @@ export default function Home() {
 
   // API 呼び出し
   useEffect(() => {
-    console.log('ccc',botName);
+    console.log('ccc',encodeURIComponent(botName));
     if (!botName) return;
-    fetch(`/api/listRichMenus?botName=${botName}`)
+    fetch(`/api/listRichMenus?botName=${encodeURIComponent(botName)}`)
       .then(res => res.json())
       .then(data => console.log(data));
   }, [botName]);
@@ -117,10 +119,12 @@ export default function Home() {
     for (const user of filteredUsers) {
       let account = 0;
       // アカウント追加時修正箇所
-      if (user.botName === "株式会社TETOTE") {
+      if (user.botName == "株式会社TETOTE") {
         account = 1;
-      } else if (user.botName === "mokara bridal etc.") {
+      } else if (user.botName == "mokara bridal etc.") {
         account = 3;
+      } else if (user.botName == "飲食店テスト") {
+        account = 4;
       }
       // else if (botName == 'XXXXX') {
       //   account = 4;

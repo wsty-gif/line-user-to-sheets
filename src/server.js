@@ -29,6 +29,14 @@ const bots = [
       channelSecret: process.env.CHANNEL_SECRET_3,
     },
   },
+  {
+    id: process.env.WEBHOOK_PATH_4,
+    name: '飲食店テスト',
+    config: {
+      channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_4,
+      channelSecret: process.env.CHANNEL_SECRET_4,
+    },
+  },
   // {
   //   id: process.env.WEBHOOK_PATH_3,
   //   name: 'mokara bridal etc.',
@@ -123,6 +131,8 @@ async function handleEvent(event, client, botName) {
       account = 1;
     } else if (botName == 'mokara bridal etc.') {
       account = 3;
+    } else if (botName == '飲食店テスト') {
+      account = 4;
     }
     // else if (botName == '') {
     //   account = 4;
