@@ -11,6 +11,7 @@ export default function Home() {
   function getAccountFromBotName(botName: string): number | null {
     // console.log('bbb',botName);
     // アカウント追加時修正箇所
+    console.log('bbb',botName);
     switch (botName) {
       case "株式会社TETOTE":
         return 1;
@@ -42,7 +43,7 @@ export default function Home() {
   // API 呼び出し
   useEffect(() => {
     if (!botName) return;
-    fetch(`/api/listRichMenus?botName=${encodeURIComponent(botName)}`)
+    fetch(`/api/listRichMenus?botName=${botName}`)
       .then(res => res.json())
       .then(data => console.log(data));
   }, [botName]);
