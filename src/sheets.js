@@ -47,7 +47,7 @@ async function upsertUserProfile({ timestamp, botName, userId, displayName, pict
   let currentRole = 'user'; // デフォルト
 
   for (let i = 1; i < rows.length; i++) {
-    if (rows[i][2]?.trim() === userId) { // C列 = userId
+    if (rows[i][1]?.trim() === botName && rows[i][2]?.trim() === userId) { // B列=botName, C列=userId
       targetRow = i + 1;
       currentRole = rows[i][5] || 'user'; // F列 = role を保持
       break;
