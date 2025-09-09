@@ -70,6 +70,8 @@ app.use(
 app.post('/webhook/:botId', async (req, res) => {
   const botId = req.params.botId;
   const bot = bots.find((b) => b.id === botId);
+  console.log(`[署名検証成功] aaaaaa=${botId}`);
+  console.log(`[署名検証成功] rrrrrrrr=${bot.name}`);
   if (!bot) return res.status(404).send('Bot not found');
 
   const signature = req.headers['x-line-signature'];
