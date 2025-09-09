@@ -37,6 +37,14 @@ const bots = [
       channelSecret: process.env.CHANNEL_SECRET_4,
     },
   },
+  {
+    id: process.env.WEBHOOK_PATH_5,
+    name: 'サロンデモ',
+    config: {
+      channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN_5,
+      channelSecret: process.env.CHANNEL_SECRET_5,
+    },
+  },
   // {
   //   id: process.env.WEBHOOK_PATH_3,
   //   name: 'mokara bridal etc.',
